@@ -16,7 +16,7 @@ gdf = gdf.to_crs(epsg=4326)
 
 gdf.to_file("Boroughs_boundaries.geojson", driver="GeoJSON")
 
-PAS_borough = pd.read_csv('assets/FINAL_agg_Dataset.csv')
+PAS_borough = pd.read_csv('FINAL_agg_Dataset.csv')
 PAS_borough['Date'] = pd.to_datetime(PAS_borough['year'].astype(str) + 'Q' + PAS_borough['quarter'].astype(str))
 PAS_borough = PAS_borough.drop(columns=['year', 'quarter'])
 PAS_borough = PAS_borough[['Date', 'borough', 'GoodJoblocal', 'TrustMPS',
