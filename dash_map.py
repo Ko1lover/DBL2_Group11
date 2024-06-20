@@ -4,18 +4,29 @@ from dash.dependencies import Input, Output
 import dash_leaflet as dl
 import pandas as pd
 from dash import dash_table
-PAS_borough = pd.read_csv('assets/PAS_borough_fin.csv')
-PAS_borough = PAS_borough.drop(columns=['Date'])
-PAS_borough = PAS_borough.groupby('Borough').agg('mean').reset_index()
-crime_neighbourhood = pd.read_csv('assets/metropolitan-street-latest.csv')
-crime_neighbourhood = crime_neighbourhood.drop(columns=['Longitude','Latitude','month','year','borough'])
 
+
+PAS_borough = pd.read_csv('assets/FINAL_agg_Dataset.csv')
+PAS_borough['Date'] = pd.to_datetime(PAS_borough['year'].astype(str) + 'Q' + PAS_borough['quarter'].astype(str))
+PAS_borough = PAS_borough.drop(columns=['year', 'quarter'])
+PAS_borough = PAS_borough[['Date','borough','GoodJoblocal','TrustMPS',
+'violent_q_crimes','property_q_crimes','public_order_q_crimes','drug_or_weapon_q_crimes',
+'other_q_crimes']]
+PAS_borough['stop_search_data'] = '...'
+PAS_borough['street_crime_data'] = '...'
+PAS_borough['PAS_data'] = '...'
+
+quarters = PAS_borough['Date'].dt.to_period('Q').drop_duplicates().sort_values().tolist()
 
 app = dash.Dash(__name__)
 
-
 app.layout = html.Div([
     html.H1("London Interactive Map"),
+    dcc.Dropdown(
+        id='quarter-dropdown',
+        options=[{'label': str(q), 'value': str(q)} for q in quarters],
+        value=str(quarters[0])
+    ),
     dl.Map(
         id='map',
         center=[51.5074, -0.1278],
@@ -28,63 +39,35 @@ app.layout = html.Div([
                     dl.BaseLayer(dl.TileLayer(), name='Base', checked=True),
                     dl.Overlay(
                         dl.GeoJSON(url='assets/Boroughs_boundaries.geojson', id='borough-geojson',
-                                   options=dict(style=dict(color='blue', weight=2))),
+                                   zoomToBounds=True,
+                                   hoverStyle=dict(weight=5, color='#666', dashArray='')),
                         name='Borough',
-                        checked=True
-                    ),
-                    dl.Overlay(
-                        dl.GeoJSON(url='assets/neighborhood_boundaries.geojson', id='neighborhood-geojson',
-                                   options=dict(style=dict(color='green', weight=1))),
-                        name='Neighborhood',
-                        checked=False
+                        checked=True,
                     )
                 ]
             )
         ]
     ),
     dash_table.DataTable(
-        id = 'selected-data-borough',
+        id='selected-data-borough',
         style_table={'overflowX': 'auto'},
         style_cell={'textAlign': 'left'},
-    ),
-    dash_table.DataTable(
-        id = 'selected-data-neighborhood',
-        style_table={'overflowX': 'auto'},
-        style_cell={'textAlign': 'left'},
-    ),
+    )
 ])
 
 @app.callback(
     Output('selected-data-borough', 'columns'),
     Output('selected-data-borough', 'data'),
-    [Input('borough-geojson', 'clickData')]
+    [Input('borough-geojson', 'clickData'), Input('quarter-dropdown', 'value')]
 )
-def update_selected_data(borough_feature):
-    if borough_feature is not None:
+def update_selected_data(borough_feature, selected_quarter):
+    if borough_feature is not None and selected_quarter is not None:
         borough = borough_feature['properties'].get('name', 'N/A')
-        borough = PAS_borough[PAS_borough['Borough'] == borough]
-        if borough_feature is not None:
-            return [{"name": i, "id": i} for i in borough.columns],borough.to_dict('records')
-        else:
-            return None,None
-    return None,None
-
-@app.callback(
-    Output('selected-data-neighborhood', 'columns'),
-    Output('selected-data-neighborhood', 'data'),
-    [Input('neighborhood-geojson', 'clickData')]
-)
-def update_selected_data(neighborhood_feature):
-    if neighborhood_feature is not None:
-        neighborhood_name = neighborhood_feature['properties'].get('name', 'N/A')
-        print(type(crime_neighbourhood['neighbourhood']))
-        neighborhood = crime_neighbourhood[crime_neighbourhood['neighbourhood'] == neighborhood_name]
-        if neighborhood is not None:
-            return [{"name": i, "id": i} for i in neighborhood.columns], neighborhood.to_dict('records')
-        else:
-            return None, None
-    return None, None
+        selected_quarter = pd.Period(selected_quarter, freq='Q')
+        borough_data = PAS_borough[(PAS_borough['borough'] == borough) & (PAS_borough['Date'].dt.to_period('Q') == selected_quarter)]
+        if not borough_data.empty:
+            return [{"name": i, "id": i} for i in borough_data.columns], borough_data.to_dict('records')
+    return [], []
 
 if __name__ == '__main__':
     app.run_server(debug=True)
-
