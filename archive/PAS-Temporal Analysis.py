@@ -4,7 +4,7 @@ import seaborn as sns
 from sklearn.preprocessing import LabelEncoder
 import statsmodels.api as sm
 
-data = pd.read_csv('data/PAS_borough.csv')
+data = pd.read_csv('../data/PAS_borough.csv')
 
 data['Measure'] = data['Measure'].str.strip('"').str.strip()
 

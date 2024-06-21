@@ -9,14 +9,12 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import LabelEncoder
 
-
 # Load data
-data = pd.read_csv('data/PAS_with_crime.csv')
+data = pd.read_csv('../data/PAS_with_crime.csv')
 
 # Combine 'year' and 'month' to create a proper datetime index for quarterly data
 data['Date'] = pd.to_datetime(data[['year', 'month']].astype(str).agg('-'.join, axis=1) + '-01')
 data.set_index('Date', inplace=True)
-
 
 numeric_cols = data.select_dtypes(include=[np.number]).columns.tolist()
 data_numeric = data[numeric_cols].groupby(data.index).mean()
@@ -46,8 +44,8 @@ confidence_weights = {
 
 data['Confidence_Weighted'] = sum(data[col] * weight for col, weight in confidence_weights.items())
 
-#Both weights will be adjusted after each run of feature importance 
 
+# Both weights will be adjusted after each run of feature importance
 
 
 # Function to train and evaluate the SARIMA model
@@ -63,6 +61,7 @@ def train_evaluate_sarima(data, column, order=(1, 1, 1), seasonal_order=(1, 1, 1
 
     return model_fit, forecast_df
 
+
 # Train and evaluate the SARIMA model using all data for Trust and Confidence
 model_fit_trust_all, forecast_df_trust_all = train_evaluate_sarima(data, 'Trust_Weighted')
 model_fit_confidence_all, forecast_df_confidence_all = train_evaluate_sarima(data, 'Confidence_Weighted')
@@ -70,15 +69,18 @@ model_fit_confidence_all, forecast_df_confidence_all = train_evaluate_sarima(dat
 # Train and evaluate using data up to 2019 for Trust and Confidence
 data_until_2019 = data[data.index < '2020-01-01']
 model_fit_trust_until_2019, forecast_df_trust_until_2019 = train_evaluate_sarima(data_until_2019, 'Trust_Weighted')
-model_fit_confidence_until_2019, forecast_df_confidence_until_2019 = train_evaluate_sarima(data_until_2019, 'Confidence_Weighted')
+model_fit_confidence_until_2019, forecast_df_confidence_until_2019 = train_evaluate_sarima(data_until_2019,
+                                                                                           'Confidence_Weighted')
 
 # Plotting forecasts for Trust
 plt.figure(figsize=(12, 8))
 plt.plot(data['Trust_Weighted'], label='Actual Weighted Trust')
 plt.plot(forecast_df_trust_all['forecast'], label='Forecasted Weighted Trust (All Data)', color='red')
-plt.fill_between(forecast_df_trust_all.index, forecast_df_trust_all.iloc[:, 0], forecast_df_trust_all.iloc[:, 1], color='pink', alpha=0.3)
+plt.fill_between(forecast_df_trust_all.index, forecast_df_trust_all.iloc[:, 0], forecast_df_trust_all.iloc[:, 1],
+                 color='pink', alpha=0.3)
 plt.plot(forecast_df_trust_until_2019['forecast'], label='Forecasted Weighted Trust (After 2019)', color='blue')
-plt.fill_between(forecast_df_trust_until_2019.index, forecast_df_trust_until_2019.iloc[:, 0], forecast_df_trust_until_2019.iloc[:, 1], color='lightblue', alpha=0.3)
+plt.fill_between(forecast_df_trust_until_2019.index, forecast_df_trust_until_2019.iloc[:, 0],
+                 forecast_df_trust_until_2019.iloc[:, 1], color='lightblue', alpha=0.3)
 plt.title('Weighted Trust Forecast')
 plt.xlabel('Date')
 plt.ylabel('Weighted Trust')
@@ -89,19 +91,19 @@ plt.show()
 plt.figure(figsize=(12, 8))
 plt.plot(data['Confidence_Weighted'], label='Actual Weighted Confidence')
 plt.plot(forecast_df_confidence_all['forecast'], label='Forecasted Weighted Confidence (All Data)', color='red')
-plt.fill_between(forecast_df_confidence_all.index, forecast_df_confidence_all.iloc[:, 0], forecast_df_confidence_all.iloc[:, 1], color='pink', alpha=0.3)
-plt.plot(forecast_df_confidence_until_2019['forecast'], label='Forecasted Weighted Confidence (After 2019)', color='blue')
-plt.fill_between(forecast_df_confidence_until_2019.index, forecast_df_confidence_until_2019.iloc[:, 0], forecast_df_confidence_until_2019.iloc[:, 1], color='lightblue', alpha=0.3)
+plt.fill_between(forecast_df_confidence_all.index, forecast_df_confidence_all.iloc[:, 0],
+                 forecast_df_confidence_all.iloc[:, 1], color='pink', alpha=0.3)
+plt.plot(forecast_df_confidence_until_2019['forecast'], label='Forecasted Weighted Confidence (After 2019)',
+         color='blue')
+plt.fill_between(forecast_df_confidence_until_2019.index, forecast_df_confidence_until_2019.iloc[:, 0],
+                 forecast_df_confidence_until_2019.iloc[:, 1], color='lightblue', alpha=0.3)
 plt.title('Weighted Confidence Forecast')
 plt.xlabel('Date')
 plt.ylabel('Weighted Confidence')
 plt.legend()
 plt.show()
 
-
-
 ####################
-
 
 
 # Correlation Matrix
@@ -117,9 +119,7 @@ plt.show()
 sns.pairplot(correlation_data)
 plt.show()
 
-
 ####################
-
 
 
 # Model Validation: Calculating RMSE for Trust

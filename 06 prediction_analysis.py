@@ -41,6 +41,8 @@ features = [
 # Filtered these boroughs based on interesting boroughs determined in causal analysis
 boroughs = ["Bexley", "Hackney", "Haringey", "Hillingdon", "Islington", "Kingston upon Thames", "Lewisham",
             "Waltham Forest"]
+boroughs = ["Lewisham"]
+
 
 # Analysis for each borough
 for borough in boroughs:
@@ -157,10 +159,10 @@ for borough in boroughs:
     plt.figure(figsize=(14, 6))
     plt.plot(borough_data.index, borough_data['TrustMPS'], label='Actual Trust MPS')
     plt.plot(future_dates_until_2019, future_trust_predictions_until_2019,
-             label='Future Predicted Trust MPS (Up to 2019)', color='red')
-    plt.plot(future_dates_full, future_trust_predictions_full, label='Future Predicted Trust MPS (Full Data)',
+             label='Future Predicted Trust MPS (Data up to 2019)', color='red')
+    plt.plot(future_dates_full, future_trust_predictions_full, label='Predicted Trust',
              color='green')
-    plt.title(f'Trust MPS Predictions and Future Forecast for {borough}')
+    plt.title(f'Trust Predictions for {borough}')
     plt.ylim(0, 1)
     plt.legend()
     plt.show()
@@ -169,10 +171,10 @@ for borough in boroughs:
     plt.figure(figsize=(14, 6))
     plt.plot(borough_data.index, borough_data['GoodJoblocal'], label='Actual "Good Job" local')
     plt.plot(future_dates_until_2019, future_confidence_predictions_until_2019,
-             label='Future Predicted "Good Job" Local (Up to 2019)', color='red')
+             label='Future Predicted "Good Job" Local (Data up to 2019)', color='red')
     plt.plot(future_dates_full, future_confidence_predictions_full,
-             label='Future Predicted "Good Job" Local (Full Data)', color='green')
-    plt.title(f'"Good Job" local Predictions and Future Forecast for {borough}')
+             label='Predicted Confidence', color='green')
+    plt.title(f'Confidence Predictions for {borough}')
     plt.ylim(0, 1)
     plt.legend()
     plt.show()
