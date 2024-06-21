@@ -26,7 +26,7 @@ This repository contains the code used for analysis based on which our recommend
    - Run the Jupyter notebooks numbered 01 to 04 to preprocess the data files necessary for the subsequent analysis files. This will generate additional needed files in the "data" folder within the repository.
      - **Note**: Update the variable field with the local downloads directory path in file 01.
 4. **Run Main Analysis Files**:
-   - Running the analysis files numbered 05 and 06 will produce the results used to base the recommendations on.
+   - Running the analysis files numbered 05 and 06 will produce the results used to base the recommendations on. Running the r file in RStudio is recommended.
 
 #### Files Overview
 - **Jupyter Notebooks**:
