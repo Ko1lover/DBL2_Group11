@@ -1,6 +1,5 @@
 # Understanding Trust and Confidence in Law Enforcement: A Data Science Approach
-
-## JBG050 Data Challenge 2 || Group 11
+**JBG050 Data Challenge 2 || Group 11**
 
 ### Project Context
 Law enforcement agencies, including the Metropolitan Police Service (MPS) in London, are increasingly focusing on building trust and confidence among communities. This project employs data science methods to understand the factors influencing trust and confidence in the MPS. By analyzing data from the Public Attitude Survey (PAS) and other crime statistics, the project aims to provide insights and actionable recommendations for key decision-makers and operational officers within an ~8-week timeframe.
